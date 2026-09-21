@@ -1,0 +1,28 @@
+# Build output
+Src/SpeedExec/bin/
+Src/SpeedExec/obj/
+
+# Local runtime copies (built exe + WebView2 cache) - not source
+File/
+
+# Crash logs
+crash.log
+
+# IDE
+.vs/
+.vscode/
+*.user
+*.suo
+
+# Temp
+*.tmp
+Thumbs.db
+desktop.ini
+
+# Backups/test files
+*.bak
+*.claude.bak
+compile_err.txt
+mousemoverel_test.lua
+rayfieldsource.txt
+127

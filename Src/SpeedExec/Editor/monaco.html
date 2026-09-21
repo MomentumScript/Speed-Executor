@@ -1,0 +1,1345 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+html, body {
+    margin: 0;
+    padding: 0;
+    background-color: transparent;
+    color: #e0e0e0;
+    font-family: 'Segoe UI', sans-serif;
+    overflow: hidden;
+    height: 100%;
+}
+
+#main-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100%;
+    background-color: #00000000;
+}
+
+#tab-bar {
+    background: #00000000;
+    height: 42px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0 10px;
+    gap: 6px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    overflow-x: auto;
+    font-family: 'Segoe UI', sans-serif;
+    flex-shrink: 0;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+/*i feel like it looks nicer without borders and since its inspired by cloudy i will comment them out*/
+.tab {
+    height: 32px;
+    padding: 0 12px;
+    background: #00000000;
+    color: #aaa;
+    cursor: pointer;
+    font-size: 13px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    /*border-radius: 8px;*/
+    border-radius: 5px;
+    position: relative;
+    transition: all 0.2s ease, box-shadow 0.2s ease;
+    min-width: 100px;
+    max-width: 130px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    gap: 8px;
+    /*border: 1px solid rgba(255,255,255,0.2);*/
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+.tab:hover {
+    background: rgb(40, 40, 40);
+    /*border: 1px solid rgba(255,255,255,0.25);*/
+    color: #ddd;
+}
+
+.tab.active {
+    background: rgb(45, 45, 45);
+    color: #fff;
+    /*border: 1px solid rgba(255, 255, 255, 0.35);*/
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+    z-index: 1;
+}
+
+.tab.inactive {
+    opacity: 0.8;
+    background: rgb(35, 35, 35);
+}
+
+.tab-name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tab-close {
+    margin-left: 6px;
+    color: #777;
+    font-size: 14px;
+    line-height: 0;
+    opacity: 0.6;
+    transition: all 0.2s ease;
+}
+
+.tab:hover .tab-close {
+    color: #fff;
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.luau-icon {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  display: block;
+  margin-right: 6px;
+  opacity: 0.9;
+}
+.tab:hover .luau-icon { filter: brightness(1.15); }
+.tab.active .luau-icon { filter: brightness(1.25) drop-shadow(0 0 2px rgba(255,255,255,0.35)); }
+
+#new-tab-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255,255,255,0.5);
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-left: auto;
+    order: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+#new-tab-btn:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.3);
+}
+
+.tab-enter {
+    animation: tabEnter 0.25s ease-out forwards;
+}
+
+.tab-exit {
+    animation: tabExit 0.25s ease-in forwards;
+}
+
+@keyframes tabEnter {
+    from {
+        transform: translateY(8px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes tabExit {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(-20px);
+        opacity: 0;
+    }
+}
+
+#container {
+    flex-grow: 1;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    background-color: #00000000;
+}
+
+.editor-transition-out {
+    opacity: 0;
+    transition: opacity 0.2s ease-out;
+}
+
+.editor-transition-in {
+    opacity: 1;
+    transition: opacity 0.2s ease-in;
+}
+
+.monaco-editor, .monaco-editor-background {
+    background-color: #00000000 !important;
+}
+
+.monaco-editor .margin {
+    background-color: #00000000 !important;
+}
+/*
+.minimap {
+    background-color: transparent !important;
+}
+
+.minimap-slider {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.minimap-slider:hover {
+    background-color: rgba(255, 255, 255, 0.4) !important;
+}
+
+.minimap-slider.active {
+    background-color: rgba(255, 255, 255, 0.5) !important;
+}#tab-context-menu {
+    position: fixed;
+    z-index: 999999;
+    background: #1e1e24;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    padding: 4px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.6);
+    display: none;
+    font-family: 'Segoe UI', sans-serif;
+    min-width: 120px;
+}
+#tab-context-menu .menu-item {
+    padding: 7px 14px;
+    font-size: 13px;
+    color: #e0e0e0;
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    user-select: none;
+}
+#tab-context-menu .menu-item:hover {
+    background: #33333f;
+    color: #fff;
+}
+    </style>
+</head>
+<body>
+    <div id="tab-context-menu">
+        <div class="menu-item" id="ctx-rename">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+            Rename
+        </div>
+    </div>
+    <div id="main-container">
+        <div id="tab-bar">
+            <button id="new-tab-btn">+</button>
+        </div>
+        <div id="container"></div>
+    </div>
+
+    <script src="vs/loader.js"></script>
+    <script>
+        let tabs = [];
+        let activeTab = null;
+        let Proposals = [];
+        
+        class Tab {
+            constructor() {
+                this.id = `tab-${Date.now()}`;
+                this.name = `script_${tabs.length + 1}.lua`;
+                this.content = "--Welcome to SpeedExecutor\nprint(\"Welcome\")\n";
+                this.element = this.createTabElement();
+            }
+            
+createTabElement() {
+  const tab = document.createElement('div');
+  tab.className = 'tab tab-enter inactive';
+
+  const iconSvg = `
+    <svg class="luau-icon" viewBox="0 0 24 24" aria-hidden="true">
+<defs>
+  
+  <linearGradient id="luauGrad" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="50%" stop-color="#ffffff"/>
+    <stop offset="50%" stop-color="gray"/> 
+  </linearGradient>
+  <mask id="luauMoonCut">
+    <rect width="24" height="24" fill="white"/>
+    <circle cx="16.5" cy="7.5" r="4.5" fill="gray"/>
+  </mask>
+</defs>
+      <circle cx="12" cy="12" r="10" fill="url(#luauGrad)" mask="url(#luauMoonCut)"/>
+    </svg>
+  `;
+
+  tab.innerHTML = `
+    ${iconSvg}
+    <div class="tab-name">${this.name}</div>
+    <span class="tab-close">Ã—</span>
+  `;
+
+  setTimeout(() => tab.classList.remove('tab-enter'), 300);
+
+  tab.onclick = (e) => {
+    if (!e.target.classList.contains('tab-close')) {
+      this.activate();
+    }
+  };
+
+  tab.oncontextmenu = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    showTabContextMenu(e.clientX, e.clientY, this);
+  };
+
+  const nameEl = tab.querySelector('.tab-name');
+  if (nameEl) {
+    nameEl.ondblclick = (e) => {
+      e.stopPropagation();
+      promptRenameTab(this);
+    };
+  }
+
+  tab.querySelector('.tab-close').onclick = (e) => {
+    e.stopPropagation();
+    this.close();
+  };
+
+  return tab;
+}
+            
+            activate() {
+                if (activeTab) {
+                    activeTab.element.classList.remove('active');
+                    activeTab.element.classList.add('inactive');
+                    activeTab.content = editor.getValue();
+                }
+                
+                activeTab = this;
+                this.element.classList.remove('inactive');
+                this.element.classList.add('active');
+                
+                const editorContainer = document.getElementById('container');
+                editorContainer.classList.add('editor-transition-out');
+                
+                setTimeout(() => {
+                    editor.setValue(this.content);
+                    editorContainer.classList.remove('editor-transition-out');
+                    editorContainer.classList.add('editor-transition-in');
+                    
+                    setTimeout(() => {
+                        editorContainer.classList.remove('editor-transition-in');
+                    }, 200);
+                }, 200);
+
+                pushActiveTab();
+            }
+            
+            close() {
+                if (tabs.length <= 1) return;
+                
+                this.element.classList.add('tab-exit');
+                
+                setTimeout(() => {
+                    const index = tabs.indexOf(this);
+                    tabs.splice(index, 1);
+                    this.element.remove();
+                    
+                    if (this === activeTab) {
+                        const nextTab = tabs[Math.max(0, index - 1)];
+                        nextTab.activate();
+                    }
+                }, 300);
+            }
+        }
+        
+        function createNewTab() {
+            const tab = new Tab();
+            tabs.push(tab);
+            const tabBar = document.getElementById('tab-bar');
+            tabBar.insertBefore(tab.element, document.getElementById('new-tab-btn'));
+            tab.activate();
+        }
+
+        function getValue() {
+            if (activeTab) {
+                activeTab.content = editor.getValue();
+                return activeTab.content;
+            }
+            return "";
+        }
+
+        // ---------- host bridge ----------
+        // The C# side subscribes to these so it always knows which script tab
+        // is in front (auto execute locks onto a named script).
+        function postHost(obj) {
+            try {
+                if (window.chrome && window.chrome.webview && window.chrome.webview.postMessage)
+                    window.chrome.webview.postMessage(JSON.stringify(obj));
+            } catch (e) { }
+        }
+
+        function pushActiveTab() {
+            postHost({
+                type: 'tab',
+                name: activeTab ? activeTab.name : '',
+                count: tabs.length,
+                dirty: false
+            });
+        }
+
+        function tabByName(name) {
+            for (let i = 0; i < tabs.length; i++)
+                if (tabs[i].name === name) return tabs[i];
+            return null;
+        }
+
+        let selectedContextMenuTab = null;
+
+        function showTabContextMenu(x, y, tabObj) {
+            selectedContextMenuTab = tabObj;
+            const menu = document.getElementById('tab-context-menu');
+            if (!menu) return;
+            menu.style.left = Math.min(x, window.innerWidth - 130) + 'px';
+            menu.style.top = Math.min(y, window.innerHeight - 80) + 'px';
+            menu.style.display = 'block';
+        }
+
+        function hideTabContextMenu() {
+            const menu = document.getElementById('tab-context-menu');
+            if (menu) menu.style.display = 'none';
+            selectedContextMenuTab = null;
+        }
+
+        document.addEventListener('click', hideTabContextMenu);
+        document.addEventListener('contextmenu', (e) => {
+            if (!e.target.closest('.tab')) {
+                hideTabContextMenu();
+            }
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const ctxRenameBtn = document.getElementById('ctx-rename');
+            if (ctxRenameBtn) {
+                ctxRenameBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    if (selectedContextMenuTab) {
+                        promptRenameTab(selectedContextMenuTab);
+                    }
+                    hideTabContextMenu();
+                };
+            }
+        });
+
+        function promptRenameTab(tabObj) {
+            if (!tabObj) return;
+            const newName = prompt("Rename script tab:", tabObj.name);
+            if (newName !== null && newName.trim() !== "") {
+                tabObj.name = newName.trim();
+                const label = tabObj.element.querySelector('.tab-name');
+                if (label) label.textContent = tabObj.name;
+                pushActiveTab();
+            }
+        }
+
+        // setValue / getValue drive the *active* tab (header toolbar + execute).
+        window.setValue = function (value) {
+            value = value == null ? "" : String(value);
+            if (activeTab) activeTab.content = value;
+            editor.setValue(value);
+        };
+
+        window.getValue = getValue;
+        window.getActiveTabName = function () { return activeTab ? activeTab.name : ""; };
+        window.getTabNames = function () { return tabs.map(t => t.name); };
+        window.newTab = function () { createNewTab(); return activeTab ? activeTab.name : ""; };
+
+        // Open (or re-focus) a named tab, used by the file list.
+        window.openFileTab = function (name, content) {
+            content = content == null ? "" : String(content);
+            let existing = tabByName(name);
+            if (existing) {
+                existing.content = content;
+                if (existing === activeTab) editor.setValue(content);
+                else existing.activate();
+                return name;
+            }
+            const tab = new Tab();
+            tab.name = name;
+            tab.content = content;
+            tabs.push(tab);
+            document.getElementById('tab-bar').insertBefore(tab.element, document.getElementById('new-tab-btn'));
+            const label = tab.element.querySelector('.tab-name');
+            if (label) label.textContent = name;
+            tab.activate();
+            return name;
+        };
+
+        window.renameActiveTab = function (name) {
+            if (!activeTab || !name) return;
+            activeTab.name = name;
+            const label = activeTab.element.querySelector('.tab-name');
+            if (label) label.textContent = name;
+            pushActiveTab();
+        };
+
+        window.setEditorTheme = function (fontSize) {
+            if (fontSize) editor.updateOptions({ fontSize: fontSize });
+        };
+
+        // Multi-tab persistence: the host snapshots every open tab on exit and
+        // rebuilds them on the next launch.
+        window.exportTabs = function () {
+            if (activeTab) activeTab.content = editor.getValue();
+            return tabs.map(function (t) { return { name: t.name, content: t.content }; });
+        };
+
+        window.getActiveTabIndex = function () { return tabs.indexOf(activeTab); };
+
+        window.openTabs = function (list, active) {
+            if (!list || !list.length) return;
+            for (let i = 0; i < list.length; i++) {
+                const item = list[i] || {};
+                window.openFileTab(item.name || ("script_" + (i + 1) + ".lua"), item.content || "");
+            }
+            const idx = (typeof active === 'number' && active >= 0 && active < tabs.length) ? active : 0;
+            const target = tabs[idx] || tabs[0];
+            if (target) target.activate();
+        };
+
+        window.restoreActiveView = function (cursor, scroll) {
+            try {
+                if (cursor > 0) editor.setPosition(editor.getModel().getPositionAt(cursor));
+                if (scroll > 0) editor.setScrollTop(scroll);
+            } catch (e) { }
+        };
+
+        function getDependencyProposals() {
+            return Proposals;
+        }
+
+        function initializeProposals() {
+            Proposals = [{
+                label: "print",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Prints values to the output",
+                insertText: 'print("${1:message}")',
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            },
+            {
+                label: "printidentity",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Returns The Current Identity",
+                insertText: 'printidentity()',
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "require",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Loads a module",
+                insertText: 'require("${1:module}")',
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "function",
+                kind: monaco.languages.CompletionItemKind.Keyword,
+                documentation: "Defines a function",
+                insertText: "function ${1:name}(${2:params})\n\t${3}\nend",
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "if",
+                kind: monaco.languages.CompletionItemKind.Keyword,
+                documentation: "Conditional statement",
+                insertText: "if ${1:condition} then\n\t${2}\nend",
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "for",
+                kind: monaco.languages.CompletionItemKind.Keyword,
+                documentation: "For loop",
+                insertText: "for ${1:i} = ${2:1}, ${3:10} do\n\t${4}\nend",
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "while",
+                kind: monaco.languages.CompletionItemKind.Keyword,
+                documentation: "While loop",
+                insertText: "while ${1:condition} do\n\t${2}\nend",
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "getgenv",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Returns the global environment table",
+                insertText: "getgenv()",
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "getrenv",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Returns the Roblox environment table",
+                insertText: "getrenv()",
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "getreg",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Returns the registry table",
+                insertText: "getreg()",
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "getgc",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Returns all GC objects matching optional filter",
+                insertText: "getgc(${1:filter})",
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "getinstances",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Returns all instances in the game",
+                insertText: "getinstances()",
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "getnilinstances",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Returns all nil instances in the game",
+                insertText: "getnilinstances()",
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "getscripts",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Returns all scripts in the game",
+                insertText: "getscripts()",
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "getloadedmodules",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Returns all loaded modules",
+                insertText: "getloadedmodules()",
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "getconnections",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Returns all connections to a signal",
+                insertText: "getconnections(${1:signal})",
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "firesignal",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Fires a signal with given arguments",
+                insertText: "firesignal(${1:signal}, ${2:...})",
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "fireclickdetector",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Fires a ClickDetector",
+                insertText: "fireclickdetector(${1:clickdetector}, ${2:distance})",
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "firetouchinterest",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Fires TouchInterest between parts",
+                insertText: "firetouchinterest(${1:part1}, ${2:part2}, ${3:touch})",
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "hookfunction",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Hooks a function with a new function",
+                insertText: "hookfunction(${1:original}, ${2:hook})",
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "newcclosure",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Creates a C closure from a function",
+                insertText: "newcclosure(${1:func})",
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "checkcaller",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Returns true if called from secure context",
+                insertText: "checkcaller()",
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "isnetworkowner",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Returns network ownership status of part",
+                insertText: "isnetworkowner(${1:part})",
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "setsimulationradius",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Sets the simulation radius",
+                insertText: "setsimulationradius(${1:radius})",
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "getrawmetatable",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Gets the raw metatable of an object",
+                insertText: "getrawmetatable(${1:object})",
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "setrawmetatable",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Sets the raw metatable of an object",
+                insertText: "setrawmetatable(${1:object}, ${2:metatable})",
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "setreadonly",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Sets the readonly status of a table",
+                insertText: "setreadonly(${1:table}, ${2:readonly})",
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "isreadonly",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Checks if a table is readonly",
+                insertText: "isreadonly(${1:table})",
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "make_writeable",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Makes a protected table writeable",
+                insertText: "make_writeable(${1:table})",
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "make_readonly",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Makes a table readonly",
+                insertText: "make_readonly(${1:table})",
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "identifyexecutor",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Returns the current exploit name",
+                insertText: "identifyexecutor()",
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "hookmetamethod",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Hooks a metamethod",
+                insertText: 'hookmetamethod(${1:instance}, "${2:method}", ${3:hook})',
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "clonefunction",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Clones a function",
+                insertText: "clonefunction(${1:func})",
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "islclosure",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Checks if function is Lua closure",
+                insertText: "islclosure(${1:func})",
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "iscclosure",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Checks if function is C closure",
+                insertText: "iscclosure(${1:func})",
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "getnamecallmethod",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Gets the namecall method",
+                insertText: "getnamecallmethod()",
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "setnamecallmethod",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Sets the namecall method",
+                insertText: 'setnamecallmethod("${1:name}")',
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "getcallingscript",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Gets the script that called the current function",
+                insertText: "getcallingscript()",
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "getproperties",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Gets all properties of an instance",
+                insertText: "getproperties(${1:instance})",
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "gethiddenproperty",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Gets a hidden property of an instance",
+                insertText: 'gethiddenproperty(${1:instance}, "${2:property}")',
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "sethiddenproperty",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Sets a hidden property of an instance",
+                insertText: 'sethiddenproperty(${1:instance}, "${2:property}", ${3:value})',
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "getthreadidentity",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Gets the current thread identity",
+                insertText: "getthreadidentity()",
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "setthreadidentity",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Sets the thread identity",
+                insertText: "setthreadidentity(${1:identity})",
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "isexecutorclosure",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Checks if function is executor closure",
+                insertText: "isexecutorclosure(${1:func})",
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "request",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Makes HTTP requests (syn.request)",
+                insertText: 'request({\n\tUrl = "${1:url}",\n\tMethod = "${2:GET}",\n\tHeaders = ${3:{}},\n\tBody = ${4:nil}\n})',
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "saveinstance",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Saves the current game instance",
+                insertText: "saveinstance(${1:options})",
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "getcustomasset",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Gets a custom asset from the exploit folder",
+                insertText: 'getcustomasset("${1:path}")',
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "delfolder",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Deletes a folder from the exploit workspace",
+                insertText: 'delfolder("${1:name}")',
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "makefolder",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Creates a folder in the exploit workspace",
+                insertText: 'makefolder("${1:name}")',
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "appendfile",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Appends to a file in the exploit workspace",
+                insertText: 'appendfile("${1:name}", ${2:content})',
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "writefile",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Writes to a file in the exploit workspace",
+                insertText: 'writefile("${1:name}", ${2:content})',
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "readfile",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Reads a file from the exploit workspace",
+                insertText: 'readfile("${1:name}")',
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "loadfile",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Loads and executes a file from the exploit workspace",
+                insertText: 'loadfile("${1:name}")',
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "isfile",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Checks if a file exists in the exploit workspace",
+                insertText: 'isfile("${1:name}")',
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "isfolder",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Checks if a folder exists in the exploit workspace",
+                insertText: 'isfolder("${1:name}")',
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "delfile",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Deletes a file from the exploit workspace",
+                insertText: 'delfile("${1:name}")',
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            },
+            {
+                label: "Speed Executor On Top",
+                kind: monaco.languages.CompletionItemKind.Keyword,
+                documentation: "Fr its fire no joke",
+                insertText: 'print("Speed Executor On Top")',
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }, {
+                label: "listfiles",
+                kind: monaco.languages.CompletionItemKind.Function,
+                documentation: "Lists files in a folder from the exploit workspace",
+                insertText: 'listfiles("${1:name}")',
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }]
+        }
+
+        require.config({ paths: { 'vs': 'vs' } });
+        require(['vs/editor/editor.main'], function() {
+            monaco.languages.register({ id: 'lua' });
+            monaco.languages.setMonarchTokensProvider('lua', {
+                defaultToken: '',
+                tokenPostfix: '.lua',
+                keywords: [
+                    'and', 'break', 'do', 'else', 'elseif', 'end', 'false', 'for', 'function', 'if',
+                    'in', 'local', 'nil', 'not', 'or', 'repeat', 'return', 'then', 'true', 'until', 'while',
+                    'goto', 'print', 'printidentity'
+                ],
+                typeKeywords: [
+                    'any', 'boolean', 'number', 'string', 'table'
+                ],
+                operators: [
+                    '+', '-', '*', '/', '%', '^', '#', '==', '~=', '<=', '>=', '<', '>', '=',
+                    ';', ':', ',', '.', '..', '...'
+                ],
+                symbols: /[=><!~?:&|+\-*\/\^%]+/,
+                escapes: /\\(?:[abfnrtv\\"']|x[0-9A-Fa-f]{1,4}|u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8})/,
+                tokenizer: {
+                    root: [
+                        [/(and|break|do|else|elseif|end|false|for|function|if|in|local|nil|not|or|repeat|return|then|true|until|while|goto|print|printidentity)\b/, 'keyword'],
+                        [/[a-zA-Z_]\w*/, {
+                            cases: {
+                                '@typeKeywords': 'keyword',
+                                '@default': 'identifier'
+                            }
+                        }],
+                        { include: '@whitespace' },
+                        [/[{}()\[\]]/, '@brackets'],
+                        [/[<>](?!@symbols)/, '@brackets'],
+                        [/@symbols/, {
+                            cases: {
+                                '@operators': 'operator',
+                                '@default': ''
+                            }
+                        }],
+                        [/\d*\.\d+([eE][\-+]?\d+)?/, 'number.float'],
+                        [/0[xX][0-9a-fA-F]+/, 'number.hex'],
+                        [/\d+/, 'number'],
+                        [/[;,.]/, 'delimiter'],
+                        [/"([^"\\]|\\.)*$/, 'string.invalid'],
+                        [/'([^'\\]|\\.)*$/, 'string.invalid'],
+                        [/"/, 'string', '@string_double'],
+                        [/'/, 'string', '@string_single'],
+                        [/\[=*\[/, 'string', '@string_multiline']
+                    ],
+                    whitespace: [
+                        [/[ \t\r\n]+/, 'white'],
+                        [/--\[=*\[/, 'comment', '@comment_multiline'],
+                        [/--.*$/, 'comment']
+                    ],
+                    string_double: [
+                        [/[^\\"]+/, 'string'],
+                        [/@escapes/, 'string.escape'],
+                        [/\\./, 'string.escape.invalid'],
+                        [/"/, 'string', '@pop']
+                    ],
+                    string_single: [
+                        [/[^\\']+/, 'string'],
+                        [/@escapes/, 'string.escape'],
+                        [/\\./, 'string.escape.invalid'],
+                        [/'/, 'string', '@pop']
+                    ],
+                    string_multiline: [
+                        [/[^\]]+/, 'string'],
+                        [/\]=*\]/, 'string', '@pop'],
+                        [/./, 'string']
+                    ],
+                    comment_multiline: [
+                        [/[^\]]+/, 'comment'],
+                        [/\]=*\]/, 'comment', '@pop'],
+                        [/./, 'comment']
+                    ],
+                }
+            });
+
+            monaco.editor.defineTheme('dark-gray-theme', {
+                base: 'vs-dark',
+                inherit: true,
+                rules: [
+                    { token: 'keyword', foreground: '#ffffff', fontStyle: 'bold' },
+                    { token: 'keyword.control', foreground: '#dcdcdc', fontStyle: 'bold' },
+                    { token: 'keyword.operator', foreground: '#ffffff' },
+                    { token: 'keyword.local', foreground: '#dcdcdc', fontStyle: 'bold' },
+                    { token: 'keyword.other', foreground: '#dcdcdc', fontStyle: 'bold' },
+                    { token: 'entity.name.function', foreground: '#ffffff', fontStyle: 'bold' },
+                    { token: 'support.function', foreground: '#5D9BFF', fontStyle: 'bold' },
+                    { token: 'function', foreground: '#ffffff', fontStyle: 'bold' },
+                    { token: 'variable', foreground: '#e0e0e0' },
+                    { token: 'string', foreground: '#dcdcdc' },
+                    { token: 'number', foreground: '#dcdcdc', fontStyle: 'bold' },
+                    { token: 'comment', foreground: '#b4b4b4' },
+                    { token: 'delimiter', foreground: '#ffffff' },
+                    { token: 'type', foreground: '#dcdcdc', fontStyle: 'bold' },
+                    { token: 'identifier', foreground: '#e0e0e0' },
+                    { token: 'operator', foreground: '#ffffff' }
+                ],
+                colors: {
+                    'editor.background': '#00000000',
+                    'editor.foreground': '#e0e0e0',
+                    'editorLineNumber.foreground': '#666666',
+                    'editorLineNumber.activeForeground': '#ffffff',
+                    'editorCursor.foreground': '#ffffff',
+                    'editor.selectionBackground': '#ffffff4d',
+                    'editor.inactiveSelectionBackground': '#87CEFA20',
+                    'editorSuggestWidget.background': '#1e1e1e',
+                    'editorSuggestWidget.highlightForeground': '#ffffff',
+                    'editorBracketMatch.background': '#87CEFA20',
+                    'editorBracketMatch.border': '#87CEFA60',
+                    'editorGutter.background': '#00000000',
+                    'editorHoverWidget.background': '#1e1e1e',
+                    'editorHoverWidget.border': '#333333',
+                    'editorWhitespace.foreground': '#444444',
+                    'editorIndentGuide.background': '#444444',
+                    'editorIndentGuide.activeBackground': '#666666',
+                    
+                    "minimap.foreground": "#ffffff",
+                    "minimap.background": "#141414", // 20,20,20 in rgb 
+                    "minimap.selectionHighlight": "#ffffff22",
+                    "minimapSlider.background": "#ffffff22",
+                    "minimapSlider.hoverBackground": "#ffffff33",
+                    "minimapSlider.activeBackground": "#ffffff44"
+                }
+            });
+
+            // Re-registered on purpose: this is the colourful, Luau/executor aware
+            // tokenizer that replaces the flat grey one.
+            monaco.languages.setMonarchTokensProvider('lua', {
+                defaultToken: '',
+                tokenPostfix: '.lua',
+                controlKeywords: ['if', 'elseif', 'else', 'end', 'for', 'while', 'repeat',
+                                  'until', 'do', 'then', 'return', 'break', 'continue', 'goto'],
+                operatorKeywords: ['and', 'or', 'not'],
+                valueKeywords: ['local', 'function', 'nil', 'true', 'false', 'in'],
+                typeKeywords: ['any', 'boolean', 'number', 'string', 'table', 'thread',
+                               'userdata', 'vector', 'buffer', 'never', 'self'],
+                globals: ['game', 'workspace', 'script', 'shared', '_G', '_ENV', 'Enum',
+                          'Instance', 'Vector2', 'Vector3', 'Vector3int16', 'Vector2int16',
+                          'CFrame', 'Color3', 'ColorSequence', 'ColorSequenceKeypoint',
+                          'NumberRange', 'NumberSequence', 'NumberSequenceKeypoint',
+                          'Rect', 'Region3', 'Region3int16', 'TweenInfo', 'Ray', 'UDim',
+                          'UDim2', 'Font', 'BrickColor', 'DateTime', 'PhysicalProperties',
+                          'Random', 'Axes', 'Faces', 'RaycastParams', 'OverlapParams',
+                          'Content', 'PathWaypoint', 'FloatCurveKey', 'RotationCurveKey',
+                          'DockWidgetPluginGuiInfo', 'CatalogSearchParams', 'Secret'],
+                stdlib: ['print', 'warn', 'error', 'assert', 'pcall', 'xpcall', 'type',
+                         'typeof', 'tostring', 'tonumber', 'pairs', 'ipairs', 'next',
+                         'select', 'rawget', 'rawset', 'rawequal', 'rawlen', 'setmetatable',
+                         'getmetatable', 'require', 'unpack', 'loadstring', 'collectgarbage',
+                         'newproxy', 'os', 'math', 'string', 'table', 'coroutine', 'debug',
+                         'utf8', 'bit32', 'buffer', 'task', 'spawn', 'wait', 'delay', 'tick',
+                         'time', 'elapsedTime', 'settings', 'UserSettings', 'gcinfo',
+                         'printidentity', 'printidentity'],
+                executor: ['getgenv', 'getrenv', 'getreg', 'getgc', 'getinstances',
+                           'getnilinstances', 'getscripts', 'getloadedmodules',
+                           'getconnections', 'firesignal', 'fireclickdetector',
+                           'firetouchinterest', 'fireproximityprompt', 'hookfunction',
+                           'newcclosure', 'checkcaller', 'isnetworkowner',
+                           'setsimulationradius', 'getrawmetatable', 'setrawmetatable',
+                           'setreadonly', 'isreadonly', 'make_writeable', 'make_readonly',
+                           'identifyexecutor', 'getexecutorname', 'hookmetamethod',
+                           'clonefunction', 'islclosure', 'iscclosure', 'getnamecallmethod',
+                           'setnamecallmethod', 'getcallingscript', 'getproperties',
+                           'gethiddenproperty', 'sethiddenproperty', 'getthreadidentity',
+                           'setthreadidentity', 'isexecutorclosure', 'request',
+                           'http_request', 'http_get', 'http_post', 'saveinstance',
+                           'getcustomasset', 'makefolder', 'delfolder', 'writefile',
+                           'appendfile', 'readfile', 'loadfile', 'isfile', 'isfolder',
+                           'delfile', 'listfiles', 'getclipboard', 'setclipboard',
+                           'toclipboard', 'gethui', 'setfpscap', 'getfpscap', 'cloneref',
+                           'compareinstances', 'getsenv', 'getscripthash',
+                           'getscriptbytecode', 'decompile', 'setfflag', 'getfflag',
+                           'queue_on_teleport', 'queueonteleport', 'isrenderobj',
+                           'getrenderproperty', 'setrenderproperty', 'cleardrawcache',
+                           'Drawing', 'isrbxactive', 'iswindowactive', 'keypress',
+                           'mouse1click', 'mouse2click', 'mousemoverel', 'mousemoveabs',
+                           'getscriptclosure', 'getcallbackvalue', 'getcallbackmember',
+                           'getcustomasset', 'getscripthash', 'hookfunction'],
+                operators: [
+                    '+', '-', '*', '/', '%', '^', '#', '==', '~=', '<=', '>=', '<', '>', '=',
+                    ';', ':', ',', '.', '..', '...', 'and', 'or', 'not'
+                ],
+                symbols: /[=><!~?:&|+\-*\/\^%]+/,
+                escapes: /\\(?:[abfnrtv\\"']|x[0-9A-Fa-f]{1,4}|u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8})/,
+                tokenizer: {
+                    root: [
+                        [/--\[=*\[/, 'comment', '@comment_multiline'],
+                        [/--.*$/, 'comment'],
+
+                        [/\b(function)(\s+)([a-zA-Z_][\w.:]*)/,
+                         ['keyword', 'white', 'entity.name.function']],
+                        [/\b(local|for)(\s+)([a-zA-Z_]\w*)/,
+                         ['keyword', 'white', 'variable.parameter']],
+
+                        // anything directly followed by "(" reads as a call
+                        [/[a-zA-Z_]\w*(?=\s*\()/, {
+                            cases: {
+                                '@operatorKeywords': 'keyword.operator',
+                                '@controlKeywords': 'keyword',
+                                '@valueKeywords': 'keyword',
+                                '@typeKeywords': 'type',
+                                '@executor': 'support.function',
+                                '@stdlib': 'support.function',
+                                '@globals': 'support.function',
+                                '@default': 'entity.name.function'
+                            }
+                        }],
+                        [/[a-zA-Z_]\w*/, {
+                            cases: {
+                                '@operatorKeywords': 'keyword.operator',
+                                '@controlKeywords': 'keyword',
+                                '@valueKeywords': 'keyword',
+                                '@typeKeywords': 'type',
+                                '@executor': 'support.function',
+                                '@stdlib': 'support.function',
+                                '@globals': 'constant',
+                                '@default': 'identifier'
+                            }
+                        }],
+
+                        [/[{}()\[\]]/, '@brackets'],
+                        [/[<>](?!@symbols)/, '@brackets'],
+                        [/@symbols/, {
+                            cases: {
+                                '@operators': 'operator',
+                                '@default': ''
+                            }
+                        }],
+
+                        [/\d*\.\d+([eE][\-+]?\d+)?/, 'number.float'],
+                        [/0[xX][0-9a-fA-F]+/, 'number.hex'],
+                        [/\d+/, 'number'],
+
+                        [/[;,.]/, 'delimiter'],
+
+                        [/"([^"\\]|\\.)*$/, 'string.invalid'],
+                        [/'([^'\\]|\\.)*$/, 'string.invalid'],
+                        [/"/, 'string', '@string_double'],
+                        [/'/, 'string', '@string_single'],
+                        [/\[=*\[/, 'string', '@string_multiline'],
+
+                        [/[ \t\r\n]+/, 'white']
+                    ],
+                    string_double: [
+                        [/[^\\"]+/, 'string'],
+                        [/@escapes/, 'string.escape'],
+                        [/\\./, 'string.escape.invalid'],
+                        [/"/, 'string', '@pop']
+                    ],
+                    string_single: [
+                        [/[^\\']+/, 'string'],
+                        [/@escapes/, 'string.escape'],
+                        [/\\./, 'string.escape.invalid'],
+                        [/'/, 'string', '@pop']
+                    ],
+                    string_multiline: [
+                        [/[^\]]+/, 'string'],
+                        [/\]=*\]/, 'string', '@pop'],
+                        [/./, 'string']
+                    ],
+                    comment_multiline: [
+                        [/[^\]]+/, 'comment'],
+                        [/\]=*\]/, 'comment', '@pop'],
+                        [/./, 'comment']
+                    ]
+                }
+            });
+
+            monaco.editor.defineTheme('dark-gray-theme', {
+                base: 'vs-dark',
+                inherit: true,
+                rules: [
+                    { token: 'keyword', foreground: '#C792EA' },
+                    { token: 'keyword.operator', foreground: '#89DDFF' },
+                    { token: 'type', foreground: '#4EC9B0' },
+                    { token: 'constant', foreground: '#4EC9B0' },
+                    { token: 'support.function', foreground: '#DCDCAA' },
+                    { token: 'entity.name.function', foreground: '#DCDCAA' },
+                    { token: 'support.class', foreground: '#4EC9B0' },
+                    { token: 'support.variable', foreground: '#9CDCFE' },
+                    { token: 'variable.parameter', foreground: '#9CDCFE' },
+                    { token: 'variable', foreground: '#D4D4D4' },
+                    { token: 'identifier', foreground: '#D4D4D4' },
+                    { token: 'string', foreground: '#CE9178' },
+                    { token: 'string.escape', foreground: '#D7BA7D' },
+                    { token: 'string.invalid', foreground: '#F44747' },
+                    { token: 'number', foreground: '#B5CEA8' },
+                    { token: 'comment', foreground: '#6A9955', fontStyle: 'italic' },
+                    { token: 'operator', foreground: '#D4D4D4' },
+                    { token: 'delimiter', foreground: '#D4D4D4' },
+                    { token: 'white', foreground: '#D4D4D4' }
+                ],
+                colors: {
+                    'editor.background': '#00000000',
+                    'editor.foreground': '#D4D4D4',
+                    'editorLineNumber.foreground': '#6E7687',
+                    'editorLineNumber.activeForeground': '#C792EA',
+                    'editorCursor.foreground': '#7CE0FF',
+                    'editor.lineHighlightBackground': '#FFFFFF0A',
+                    'editor.selectionBackground': '#4C8DFF55',
+                    'editor.inactiveSelectionBackground': '#87CEFA20',
+                    'editorSuggestWidget.background': '#1B1B22',
+                    'editorSuggestWidget.selectedBackground': '#2C2C38',
+                    'editorSuggestWidget.highlightForeground': '#7CE0FF',
+                    'editorBracketMatch.background': '#4C8DFF22',
+                    'editorBracketMatch.border': '#4C8DFFAA',
+                    'editorGutter.background': '#00000000',
+                    'editorHoverWidget.background': '#1B1B22',
+                    'editorHoverWidget.border': '#33333F',
+                    'editorWhitespace.foreground': '#3B3B46',
+                    'editorIndentGuide.background': '#3B3B46',
+                    'editorIndentGuide.activeBackground': '#7CE0FF',
+
+                    'minimap.foreground': '#ffffff',
+                    'minimap.background': '#141414',
+                    'minimap.selectionHighlight': '#ffffff22',
+                    'minimapSlider.background': '#ffffff22',
+                    'minimapSlider.hoverBackground': '#ffffff33',
+                    'minimapSlider.activeBackground': '#ffffff44'
+                }
+            });
+
+            editor = monaco.editor.create(document.getElementById('container'), {
+                value: "--Welcome to SpeedExecutor\nprint(\"Welcome\")\n",
+                language: 'lua',
+                theme: 'dark-gray-theme',
+                //fontFamily: 'cascadia mono', // monako font (cascadia mono is nice but u could use default font if u want)
+                fontSize: 14, // original font size is 14
+                minimap: { enabled: true },
+                automaticLayout: true,
+                scrollBeyondLastLine: false,
+                roundedSelection: true,
+                cursorBlinking: 'smooth',
+                cursorSmoothCaretAnimation: true,
+                autoClosingBrackets: 'languageDefined',
+                autoClosingQuotes: 'languageDefined',
+                autoSurround: 'languageDefined',
+                autoIndent: 'full',
+                suggestOnTriggerCharacters: true
+            });
+
+            // bracket handling
+            editor.onKeyDown(function(e) {
+                const selection = editor.getSelection();
+                const model = editor.getModel();
+                const selectedText = model.getValueInRange(selection);
+                const position = selection.getStartPosition();
+                const lineContent = model.getLineContent(position.lineNumber);
+                const nextChar = lineContent.charAt(position.column - 1);
+                const prevChar = position.column > 1 ? lineContent.charAt(position.column - 2) : '';
+
+                // only handle auto-pairing when nothing is selected
+                if (selectedText.length === 0) {
+                    const pairs = {
+                        '(': ')',
+                        '[': ']',
+                        '{': '}',
+                        '"': '"',
+                        "'": "'"
+                    };
+
+                    // handle opening pairs
+                    if (pairs.hasOwnProperty(e.browserEvent.key)) {
+                        // skip if its in a string or comment
+                        const word = model.getWordAtPosition(position);
+                        const isInString = word && (word.word.startsWith('"') || word.word.startsWith("'"));
+                        const isInComment = lineContent.trim().startsWith('--');
+                        
+                        if (!isInString && !isInComment) {
+                            // skip if next character is already the closing pair
+                            if (nextChar !== e.browserEvent.key) {
+                                e.preventDefault();
+                                const closeChar = pairs[e.browserEvent.key];
+                                
+                                editor.executeEdits('auto-pair', [{
+                                    range: new monaco.Range(
+                                        position.lineNumber,
+                                        position.column,
+                                        position.lineNumber,
+                                        position.column
+                                    ),
+                                    text: e.browserEvent.key + closeChar,
+                                    forceMoveMarkers: true
+                                }]);
+                                
+                                // move cursor inside the pair
+                                editor.setPosition(new monaco.Position(
+                                    position.lineNumber,
+                                    position.column + 1
+                                ));
+                            }
+                        }
+                    }
+                    
+                    // handle closing pairs
+                    else if (Object.values(pairs).includes(e.browserEvent.key)) {
+                        if (nextChar === e.browserEvent.key) {
+                            e.preventDefault();
+                            // just move the cursor past the existing closing character
+                            editor.setPosition(new monaco.Position(
+                                position.lineNumber,
+                                position.column + 1
+                            ));
+                        }
+                    }
+                }
+            });
+
+            // register completion provider
+            monaco.languages.registerCompletionItemProvider('lua', {
+                provideCompletionItems: function(model, position) {
+                    const word = model.getWordUntilPosition(position);
+                    const range = {
+                        startLineNumber: position.lineNumber,
+                        endLineNumber: position.lineNumber,
+                        startColumn: word.startColumn,
+                        endColumn: word.endColumn
+                    };
+                    
+                    const suggestions = getDependencyProposals().map(item => ({
+                        label: item.label,
+                        kind: item.kind,
+                        documentation: item.documentation,
+                        insertText: item.insertText,
+                        range: range,
+                        insertTextRules: item.insertTextRules
+                    }));
+                    
+                    return { suggestions: suggestions };
+                },
+                triggerCharacters: ['.', ':', '(', '"', "'", ' ', '\t', ',', '{', '[', '=']
+            });
+
+            // initialize autocomplete
+            initializeProposals();
+
+            // set up tabs
+            document.getElementById('new-tab-btn').onclick = createNewTab;
+            createNewTab();
+
+            window.onresize = function() {
+                editor.layout();
+            };
+        });
+    </script>
+</body>
+</html>

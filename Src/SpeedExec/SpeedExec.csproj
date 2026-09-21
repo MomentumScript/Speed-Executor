@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net472</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>SpeedExecutor</RootNamespace>
+    <AssemblyName>SpeedExecutor</AssemblyName>
+    <ApplicationIcon>Images\Speed.ico</ApplicationIcon>
+    <LangVersion>latest</LangVersion>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3405.78" />
+    <PackageReference Include="System.Text.Json" Version="9.0.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.IO.Compression.FileSystem" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Images\logo.png" />
+    <Resource Include="Images\w.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="FAPI\luau\init.bin" LogicalName="FAPI.luau.init.bin" />
+    <EmbeddedResource Include="FAPI\luau\compile.exe" LogicalName="FAPI.luau.compile.exe" />
+    <EmbeddedResource Include="FAPI\luau\init.luau" LogicalName="FAPI.luau.init.luau" />
+    <EmbeddedResource Include="inject.wav" LogicalName="SpeedExec.inject.wav" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Editor\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>
